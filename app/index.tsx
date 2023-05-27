@@ -1,11 +1,25 @@
 import { Layout, Text, List, ListItem, Button } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateReminderModal } from "../components/CreateReminderModal";
+import { Reminder } from "../types";
 
 const App = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem("reminders").then((reminders) => {
+      if (!reminders) return;
+      setReminders(JSON.parse(reminders));
+    });
+  }, []);
+
+  const handleCreateReminder = async (reminder: Reminder) => {
+    setReminders((reminders) => [...reminders, reminder]);
+  };
 
   return (
     <>
@@ -29,14 +43,17 @@ const App = () => {
 
       <Layout style={{ flex: 1 }}>
         <List
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]}
-          renderItem={() => <ListItem title="Item" description="Description" />}
+          data={reminders}
+          renderItem={({ item }) => (
+            <ListItem title={item.title} description={item.description} />
+          )}
         />
       </Layout>
 
       <CreateReminderModal
         visible={isCreateModalOpen}
         onDismiss={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateReminder}
       />
     </>
   );
