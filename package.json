@@ -1,9 +1,21 @@
 {
   "dependencies": {
+    "@eva-design/eva": "^2.2.0",
+    "@react-native-community/datetimepicker": "6.7.3",
+    "@ui-kitten/components": "^5.3.1",
+    "@ui-kitten/eva-icons": "^5.3.1",
     "expo": "^48.0.7",
+    "expo-constants": "~14.2.1",
+    "expo-linking": "~4.0.1",
+    "expo-router": "^1.5.3",
+    "expo-status-bar": "~1.4.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.71.3",
+    "react-native-gesture-handler": "~2.9.0",
+    "react-native-safe-area-context": "4.5.0",
+    "react-native-screens": "~3.20.0",
+    "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.7"
   },
   "devDependencies": {
@@ -20,5 +32,6 @@
   },
   "version": "1.0.0",
   "private": true,
-  "name": "reminders"
+  "name": "reminders",
+  "main": "index.js"
 }
