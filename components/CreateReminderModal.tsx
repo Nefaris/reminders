@@ -105,7 +105,7 @@ export const CreateReminderModal = ({
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
             marginBottom: 32,
           }}
         >
@@ -144,7 +144,7 @@ export const CreateReminderModal = ({
           />
 
           <View>
-            <Text style={{ fontSize: 14, marginBottom: 4 }}>
+            <Text style={{ fontSize: 12, marginBottom: 4 }}>
               Kliknij w pole, aby wybrać datę i godzinę przypomnienia
             </Text>
 

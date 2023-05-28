@@ -1,4 +1,11 @@
-import { Layout, Text, List, ListItem, Button } from "@ui-kitten/components";
+import {
+  Layout,
+  Text,
+  List,
+  ListItem,
+  Button,
+  Spinner,
+} from "@ui-kitten/components";
 import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -9,7 +16,7 @@ import { Reminder } from "../types";
 const App = () => {
   const [reminder, setReminder] = useState<Reminder | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [reminders, setReminders] = useState<Reminder[] | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem("reminders").then((reminders) => {
@@ -65,16 +72,51 @@ const App = () => {
       />
 
       <Layout style={{ flex: 1 }}>
-        <List
-          data={reminders}
-          renderItem={({ item }) => (
-            <ListItem
-              onPress={() => handleOpenReminder(item)}
-              title={item.title}
-              description={item.description}
-            />
-          )}
-        />
+        {!reminders && (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Spinner />
+          </View>
+        )}
+
+        {reminders && (
+          <>
+            {reminders.length === 0 ? (
+              <View
+                style={{
+                  flex: 1,
+                  gap: 8,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 16,
+                }}
+              >
+                <Text style={{ textAlign: "center" }}>
+                  Nie posiadasz żadnych przypomnień.
+                </Text>
+                <Button onPress={() => setIsCreateModalOpen(true)} size="small">
+                  Dodaj przypomnienie
+                </Button>
+              </View>
+            ) : (
+              <List
+                data={reminders}
+                renderItem={({ item }) => (
+                  <ListItem
+                    onPress={() => handleOpenReminder(item)}
+                    title={item.title}
+                    description={item.description}
+                  />
+                )}
+              />
+            )}
+          </>
+        )}
       </Layout>
 
       {(isCreateModalOpen || reminder) && (
