@@ -23,7 +23,11 @@ import { Reminder } from "../types";
 import dayjs from "dayjs";
 import { ScrollView } from "react-native";
 import { scheduleReminder } from "../utils/scheduleReminder";
-import { addReminder, deleteReminder } from "../utils/reminders";
+import {
+  addReminder,
+  deleteReminder,
+  updateReminder,
+} from "../utils/reminders";
 
 type Props = {
   onDismiss: () => void;
@@ -109,7 +113,7 @@ export const CreateReminderModal = ({
   };
 
   const submitHandler = async (data: FormFields) => {
-    const newReminder = await addReminder({
+    const reminderData: Reminder = {
       id: isEdit ? reminder.id : nanoid(),
       title: data.title,
       description: data.description,
@@ -117,9 +121,11 @@ export const CreateReminderModal = ({
       time: data.time.toString(),
       isRecurring: data.isRecurring,
       repeatUnit: data.repeatUnit,
-    });
+    };
 
-    onSubmit(newReminder, isEdit);
+    const handler = isEdit ? updateReminder : addReminder;
+    await handler(reminderData);
+    onSubmit(reminderData, isEdit);
   };
 
   const isEdit = !!reminder;
