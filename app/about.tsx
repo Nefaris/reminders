@@ -8,6 +8,7 @@ const AboutPage = () => {
       <Tabs.Screen
         options={{
           title: "Informacje",
+          tabBarIcon: () => <Text>📝</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>Informacje</Text>
           ),

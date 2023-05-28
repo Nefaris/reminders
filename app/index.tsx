@@ -58,6 +58,7 @@ const App = () => {
       <Tabs.Screen
         options={{
           title: "Przypomnienia",
+          tabBarIcon: () => <Text>🔔</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>
               Przypomnienia

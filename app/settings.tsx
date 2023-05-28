@@ -40,6 +40,7 @@ const SettingsPage = () => {
       <Tabs.Screen
         options={{
           title: "Ustawienia",
+          tabBarIcon: () => <Text>⚙️</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>Ustawienia</Text>
           ),
