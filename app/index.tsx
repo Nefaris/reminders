@@ -1,5 +1,4 @@
 import {
-  Layout,
   Text,
   List,
   ListItem,
@@ -13,6 +12,7 @@ import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
+import { getReminders } from "../utils/reminders";
 
 const App = () => {
   const theme = useTheme();
@@ -21,10 +21,7 @@ const App = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem("reminders").then((reminders) => {
-      const remindersParsed = reminders ? JSON.parse(reminders) : [];
-      setReminders(remindersParsed);
-    });
+    getReminders().then((reminders) => setReminders(reminders));
   }, []);
 
   const handleOpenReminder = (reminder: Reminder) => {
@@ -42,17 +39,11 @@ const App = () => {
     setIsCreateModalOpen(false);
   };
 
-  const handleDeleteReminder = (reminder: Reminder) => {
-    const oldReminders = [...reminders];
-    const newReminders = reminders.filter((r) => r.id !== reminder.id);
-
+  const handleDeleteReminder = async (reminderId: string) => {
+    const newReminders = reminders.filter((r) => r.id !== reminderId);
     setReminder(null);
     setIsCreateModalOpen(false);
     setReminders(newReminders);
-
-    AsyncStorage.setItem("reminders", JSON.stringify(newReminders)).catch(() =>
-      setReminders(oldReminders)
-    );
   };
 
   return (

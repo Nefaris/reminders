@@ -19,16 +19,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { nanoid } from "nanoid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
 import { Reminder } from "../types";
 import dayjs from "dayjs";
 import { ScrollView } from "react-native";
 import { scheduleReminder } from "../utils/scheduleReminder";
+import { addReminder, deleteReminder } from "../utils/reminders";
 
 type Props = {
   onDismiss: () => void;
-  onSubmit: (data: Reminder) => void;
-  onDelete: (data: Reminder) => void;
+  onSubmit: (reminder: Reminder) => void;
+  onDelete: (reminderId: string) => void;
   reminder?: Reminder;
 };
 
@@ -104,19 +104,12 @@ export const CreateReminderModal = ({
   };
 
   const handleDeleteReminder = async () => {
-    const notificationId = reminder?.notificationId;
-    if (!notificationId) return;
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
-    onDelete({ ...reminder, notificationId: undefined });
+    await deleteReminder(reminder.id);
+    onDelete(reminder.id);
   };
 
   const submitHandler = async (data: FormFields) => {
-    const currentReminders = await AsyncStorage.getItem("reminders");
-    const reminders: Reminder[] = currentReminders
-      ? JSON.parse(currentReminders)
-      : [];
-
-    const reminder: Reminder = {
+    const reminder = await addReminder({
       id: nanoid(),
       title: data.title,
       description: data.description,
@@ -124,19 +117,9 @@ export const CreateReminderModal = ({
       time: data.time.toString(),
       isRecurring: data.isRecurring,
       repeatUnit: data.repeatUnit,
-    };
-
-    await AsyncStorage.setItem(
-      "reminders",
-      JSON.stringify([...reminders, reminder])
-    );
-
-    const notificationId = await scheduleReminder(reminder);
-
-    onSubmit({
-      ...reminder,
-      notificationId,
     });
+
+    onSubmit(reminder);
   };
 
   const isEdit = !!reminder;
