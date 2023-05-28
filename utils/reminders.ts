@@ -29,6 +29,24 @@ export const addReminder = async (reminder: Reminder) => {
   return newReminder;
 };
 
+export const updateReminder = async (reminder: Reminder) => {
+  const reminders = await getReminders();
+  const reminderIndex = reminders.findIndex(
+    (reminderItem) => reminderItem.id === reminder.id
+  );
+
+  const oldReminder = reminders[reminderIndex];
+  await Notifications.cancelScheduledNotificationAsync(
+    oldReminder.notificationId
+  );
+
+  const newNotificationId = await scheduleReminder(reminder);
+  const newReminder = { ...reminder, notificationId: newNotificationId };
+  reminders[reminderIndex] = newReminder;
+  await AsyncStorage.setItem("reminders", JSON.stringify(reminders));
+  return newReminder;
+};
+
 export const getRemindersHistory = async () => {
   const storageItem = await AsyncStorage.getItem("reminders_history");
   const historyReminders = storageItem ? JSON.parse(storageItem) : [];

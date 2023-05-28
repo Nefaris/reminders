@@ -9,7 +9,6 @@ import {
 import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
 import { getReminders } from "../utils/reminders";
@@ -28,8 +27,15 @@ const App = () => {
     setReminder(reminder);
   };
 
-  const handleCreateReminder = async (reminder: Reminder) => {
-    setReminders((reminders) => [...reminders, reminder]);
+  const handleSubmitReminder = async (reminder: Reminder, isEdit: boolean) => {
+    if (isEdit) {
+      setReminders((reminders) =>
+        reminders.map((r) => (r.id === reminder.id ? reminder : r))
+      );
+    } else {
+      setReminders((reminders) => [...reminders, reminder]);
+    }
+
     setIsCreateModalOpen(false);
     setReminder(null);
   };
@@ -126,7 +132,7 @@ const App = () => {
           reminder={reminder}
           onDelete={handleDeleteReminder}
           onDismiss={handleDismissReminder}
-          onSubmit={handleCreateReminder}
+          onSubmit={handleSubmitReminder}
         />
       )}
     </>

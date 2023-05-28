@@ -27,7 +27,7 @@ import { addReminder, deleteReminder } from "../utils/reminders";
 
 type Props = {
   onDismiss: () => void;
-  onSubmit: (reminder: Reminder) => void;
+  onSubmit: (reminder: Reminder, isEdit: boolean) => void;
   onDelete: (reminderId: string) => void;
   reminder?: Reminder;
 };
@@ -109,8 +109,8 @@ export const CreateReminderModal = ({
   };
 
   const submitHandler = async (data: FormFields) => {
-    const reminder = await addReminder({
-      id: nanoid(),
+    const newReminder = await addReminder({
+      id: isEdit ? reminder.id : nanoid(),
       title: data.title,
       description: data.description,
       date: data.date.toString(),
@@ -119,7 +119,7 @@ export const CreateReminderModal = ({
       repeatUnit: data.repeatUnit,
     });
 
-    onSubmit(reminder);
+    onSubmit(newReminder, isEdit);
   };
 
   const isEdit = !!reminder;
