@@ -1,13 +1,21 @@
-import { Text } from "@ui-kitten/components";
+import { Text, useTheme } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
 import { ScrollView } from "react-native";
 
 const AboutPage = () => {
+  const theme = useTheme();
+
   return (
     <>
       <Tabs.Screen
         options={{
           title: "Informacje",
+          headerStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
+          tabBarStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
           tabBarIcon: () => <Text>📝</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>Informacje</Text>
@@ -20,7 +28,7 @@ const AboutPage = () => {
           flex: 1,
           paddingVertical: 16,
           paddingHorizontal: 16,
-          backgroundColor: "#FFF",
+          backgroundColor: theme["background-basic-color-1"],
         }}
       >
         <Text style={{ fontWeight: "bold", fontSize: 16 }}>O aplikacji</Text>

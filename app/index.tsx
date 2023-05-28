@@ -5,6 +5,7 @@ import {
   ListItem,
   Button,
   Spinner,
+  useTheme,
 } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
 
 const App = () => {
+  const theme = useTheme();
   const [reminder, setReminder] = useState<Reminder | null>(null);
   const [reminders, setReminders] = useState<Reminder[] | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -58,6 +60,12 @@ const App = () => {
       <Tabs.Screen
         options={{
           title: "Przypomnienia",
+          headerStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
+          tabBarStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
           tabBarIcon: () => <Text>🔔</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>
@@ -74,7 +82,9 @@ const App = () => {
         }}
       />
 
-      <View style={{ flex: 1 }}>
+      <View
+        style={{ flex: 1, backgroundColor: theme["background-basic-color-1"] }}
+      >
         {!reminders && (
           <View
             style={{

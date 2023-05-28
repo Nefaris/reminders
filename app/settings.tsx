@@ -1,38 +1,16 @@
-import { ListItem, Text, Toggle } from "@ui-kitten/components";
+import { useContext } from "react";
+import { ListItem, Text, Toggle, useTheme } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
-import { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Preferences } from "../types";
 import { ScrollView } from "react-native";
+import { UserPreferencesContext } from "../components/UserPreferencesContext";
 
 const SettingsPage = () => {
-  const [isDarkModeEnabled, setIsDarkModeEnabled] = useState(false);
-
-  useEffect(() => {
-    const getPreferences = async () => {
-      const storagePreferences = await AsyncStorage.getItem("preferences");
-      const preferences: Preferences = JSON.parse(storagePreferences) ?? {
-        theme: "light",
-      };
-
-      setIsDarkModeEnabled(preferences.theme === "dark");
-    };
-
-    getPreferences();
-  }, []);
+  const theme = useTheme();
+  const preferences = useContext(UserPreferencesContext);
 
   const handleDarkModeToggle = async (checked: boolean) => {
-    const preferences: Preferences = {
-      theme: checked ? "dark" : "light",
-    };
-
-    setIsDarkModeEnabled(checked);
-
-    try {
-      AsyncStorage.setItem("preferences", JSON.stringify(preferences));
-    } catch {
-      setIsDarkModeEnabled(!checked);
-    }
+    const theme = checked ? "dark" : "light";
+    preferences.handleThemeChange(theme);
   };
 
   return (
@@ -40,6 +18,12 @@ const SettingsPage = () => {
       <Tabs.Screen
         options={{
           title: "Ustawienia",
+          headerStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
+          tabBarStyle: {
+            backgroundColor: theme["background-basic-color-2"],
+          },
           tabBarIcon: () => <Text>⚙️</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>Ustawienia</Text>
@@ -52,7 +36,7 @@ const SettingsPage = () => {
           flex: 1,
           paddingVertical: 16,
           paddingHorizontal: 16,
-          backgroundColor: "#FFF",
+          backgroundColor: theme["background-basic-color-1"],
         }}
       >
         <ListItem
@@ -60,7 +44,7 @@ const SettingsPage = () => {
           description="Zmień motyw aplikacji"
           accessoryRight={
             <Toggle
-              checked={isDarkModeEnabled}
+              checked={preferences.theme === "dark"}
               onChange={handleDarkModeToggle}
             />
           }
