@@ -18,8 +18,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { nanoid } from "nanoid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
 import { Reminder } from "../types";
 import dayjs from "dayjs";
+import { ScrollView } from "react-native";
+import { scheduleReminder } from "../utils/scheduleReminder";
 
 type Props = {
   onDismiss: () => void;
@@ -34,14 +37,9 @@ const formSchema = z.object({
   isRecurring: z.boolean(),
   date: z.date(),
   time: z.date(),
-  repeatUnit: z.enum([
-    "minutes",
-    "hours",
-    "days",
-    "weeks",
-    "months",
-    "years",
-  ] as const),
+  repeatUnit: z
+    .enum(["minutes", "hours", "days", "weeks", "months", "years"] as const)
+    .optional(),
 });
 
 type FormFields = z.infer<typeof formSchema>;
@@ -103,6 +101,13 @@ export const CreateReminderModal = ({
     setValue("repeatUnit", option.value, { shouldValidate: true });
   };
 
+  const handleDeleteReminder = async () => {
+    const notificationId = reminder?.notificationId;
+    if (!notificationId) return;
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
+    onDelete({ ...reminder, notificationId: undefined });
+  };
+
   const submitHandler = async (data: FormFields) => {
     const currentReminders = await AsyncStorage.getItem("reminders");
     const reminders: Reminder[] = currentReminders
@@ -124,7 +129,12 @@ export const CreateReminderModal = ({
       JSON.stringify([...reminders, reminder])
     );
 
-    onSubmit(reminder);
+    const notificationId = await scheduleReminder(reminder);
+
+    onSubmit({
+      ...reminder,
+      notificationId,
+    });
   };
 
   const isEdit = !!reminder;
@@ -146,14 +156,13 @@ export const CreateReminderModal = ({
       presentationStyle="pageSheet"
       animationType="slide"
     >
-      <View
+      <ScrollView
         style={{
           flex: 1,
           gap: 16,
           paddingTop: 16,
           paddingBottom: 32,
           paddingHorizontal: 16,
-          backgroundColor: "#fff",
         }}
       >
         <View
@@ -219,6 +228,26 @@ export const CreateReminderModal = ({
             </ButtonGroup>
           </View>
 
+          {isDatePickerOpen && (
+            <DateTimePicker
+              display="spinner"
+              mode="date"
+              minimumDate={new Date()}
+              value={dateValue}
+              onChange={handleDateChange}
+            />
+          )}
+
+          {isTimePickerOpen && (
+            <DateTimePicker
+              display="spinner"
+              mode="time"
+              is24Hour
+              value={timeValue}
+              onChange={handleTimeChange}
+            />
+          )}
+
           <CheckBox
             style={{ marginLeft: 2 }}
             checked={isRecurring}
@@ -256,29 +285,11 @@ export const CreateReminderModal = ({
           )}
         </View>
 
-        {isDatePickerOpen && (
-          <DateTimePicker
-            mode="date"
-            minimumDate={new Date()}
-            value={dateValue}
-            onChange={handleDateChange}
-          />
-        )}
-
-        {isTimePickerOpen && (
-          <DateTimePicker
-            mode="time"
-            is24Hour
-            value={timeValue}
-            onChange={handleTimeChange}
-          />
-        )}
-
-        <View style={{ gap: 8, marginTop: "auto" }}>
+        <View style={{ gap: 8, marginTop: 64 }}>
           {isEdit && (
             <Button
               status="danger"
-              onPress={() => onDelete(reminder)}
+              onPress={handleDeleteReminder}
               style={{ marginTop: "auto" }}
             >
               Usuń
@@ -287,7 +298,7 @@ export const CreateReminderModal = ({
 
           <Button onPress={handleSubmit(submitHandler)}>Zapisz</Button>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 };

@@ -1,5 +1,6 @@
-import { Layout, Text } from "@ui-kitten/components";
+import { Text } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
+import { ScrollView } from "react-native";
 
 const AboutPage = () => {
   return (
@@ -13,7 +14,14 @@ const AboutPage = () => {
         }}
       />
 
-      <Layout style={{ flex: 1, paddingHorizontal: 16 }}>
+      <ScrollView
+        style={{
+          flex: 1,
+          paddingVertical: 16,
+          paddingHorizontal: 16,
+          backgroundColor: "#FFF",
+        }}
+      >
         <Text style={{ fontWeight: "bold", fontSize: 16 }}>O aplikacji</Text>
         <Text style={{ marginBottom: 16 }}>
           Aplikacja do zarządzania przypomnieniami umożliwia łatwe dodawanie
@@ -27,7 +35,7 @@ const AboutPage = () => {
         </Text>
         <Text>Paweł Świąder</Text>
         <Text>Kacper Mędrek</Text>
-      </Layout>
+      </ScrollView>
     </>
   );
 };

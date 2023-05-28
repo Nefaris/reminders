@@ -1,8 +1,9 @@
-import { Layout, ListItem, Text, Toggle } from "@ui-kitten/components";
+import { ListItem, Text, Toggle } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Preferences } from "../types";
+import { ScrollView } from "react-native";
 
 const SettingsPage = () => {
   const [isDarkModeEnabled, setIsDarkModeEnabled] = useState(false);
@@ -45,7 +46,14 @@ const SettingsPage = () => {
         }}
       />
 
-      <Layout style={{ flex: 1, paddingHorizontal: 16 }}>
+      <ScrollView
+        style={{
+          flex: 1,
+          paddingVertical: 16,
+          paddingHorizontal: 16,
+          backgroundColor: "#FFF",
+        }}
+      >
         <ListItem
           title="Ciemny motyw"
           description="Zmień motyw aplikacji"
@@ -56,7 +64,7 @@ const SettingsPage = () => {
             />
           }
         />
-      </Layout>
+      </ScrollView>
     </>
   );
 };

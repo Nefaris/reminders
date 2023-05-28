@@ -10,7 +10,6 @@ import { Tabs } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
 import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
 
@@ -32,6 +31,8 @@ const App = () => {
 
   const handleCreateReminder = async (reminder: Reminder) => {
     setReminders((reminders) => [...reminders, reminder]);
+    setIsCreateModalOpen(false);
+    setReminder(null);
   };
 
   const handleDismissReminder = () => {
@@ -50,25 +51,6 @@ const App = () => {
     AsyncStorage.setItem("reminders", JSON.stringify(newReminders)).catch(() =>
       setReminders(oldReminders)
     );
-  };
-
-  const handleCreateNotification = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-
-    if (status !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== "granted") return;
-    }
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Time's up!",
-        body: "Change sides!",
-      },
-      trigger: {
-        seconds: 5,
-      },
-    });
   };
 
   return (
@@ -91,7 +73,7 @@ const App = () => {
         }}
       />
 
-      <Layout style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         {!reminders && (
           <View
             style={{
@@ -137,7 +119,7 @@ const App = () => {
             )}
           </>
         )}
-      </Layout>
+      </View>
 
       {(isCreateModalOpen || reminder) && (
         <CreateReminderModal

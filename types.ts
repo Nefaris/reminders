@@ -6,6 +6,7 @@ export type Reminder = {
   time: string;
   isRecurring: boolean;
   repeatUnit: "minutes" | "hours" | "days" | "weeks" | "months" | "years";
+  notificationId?: string;
 };
 
 export type Preferences = {
