@@ -1,4 +1,13 @@
-import { Input, Button, Text, ButtonGroup } from "@ui-kitten/components";
+import {
+  Input,
+  Button,
+  Text,
+  ButtonGroup,
+  CheckBox,
+  Select,
+  SelectItem,
+  IndexPath,
+} from "@ui-kitten/components";
 import { useState } from "react";
 import { Modal, View } from "react-native";
 import DateTimePicker, {
@@ -22,11 +31,33 @@ type Props = {
 const formSchema = z.object({
   title: z.string().min(1, "Pole wymagane"),
   description: z.string(),
+  isRecurring: z.boolean(),
   date: z.date(),
   time: z.date(),
+  repeatUnit: z.enum([
+    "minutes",
+    "hours",
+    "days",
+    "weeks",
+    "months",
+    "years",
+  ] as const),
 });
 
 type FormFields = z.infer<typeof formSchema>;
+
+const reccuringOptions: {
+  label: string;
+  value: Reminder["repeatUnit"];
+  index: number;
+}[] = [
+  { label: "Minutę", value: "minutes", index: 0 },
+  { label: "Godzinę", value: "hours", index: 1 },
+  { label: "Dzień", value: "days", index: 2 },
+  { label: "Tydzień", value: "weeks", index: 3 },
+  { label: "Miesiąc", value: "months", index: 4 },
+  { label: "Rok", value: "years", index: 5 },
+];
 
 export const CreateReminderModal = ({
   onDismiss,
@@ -39,12 +70,19 @@ export const CreateReminderModal = ({
 
   const { formState, handleSubmit, setValue, watch } = useForm<FormFields>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      date: new Date(),
-      time: new Date(),
-    },
+    defaultValues: reminder
+      ? {
+          ...reminder,
+          date: new Date(reminder.date),
+          time: new Date(reminder.time),
+        }
+      : {
+          title: "",
+          description: "",
+          date: new Date(),
+          time: new Date(),
+          isRecurring: false,
+        },
   });
 
   const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
@@ -59,6 +97,12 @@ export const CreateReminderModal = ({
     setValue("time", date, { shouldValidate: true });
   };
 
+  const handleReccuringOptionChange = (event: any) => {
+    const index = event.row;
+    const option = reccuringOptions[index];
+    setValue("repeatUnit", option.value, { shouldValidate: true });
+  };
+
   const submitHandler = async (data: FormFields) => {
     const currentReminders = await AsyncStorage.getItem("reminders");
     const reminders: Reminder[] = currentReminders
@@ -69,6 +113,10 @@ export const CreateReminderModal = ({
       id: nanoid(),
       title: data.title,
       description: data.description,
+      date: data.date.toString(),
+      time: data.time.toString(),
+      isRecurring: data.isRecurring,
+      repeatUnit: data.repeatUnit,
     };
 
     await AsyncStorage.setItem(
@@ -84,6 +132,12 @@ export const CreateReminderModal = ({
   const descriptionValue = watch("description");
   const dateValue = watch("date");
   const timeValue = watch("time");
+  const isRecurring = watch("isRecurring");
+  const repeatUnit = watch("repeatUnit");
+
+  const selectedRecuringOption = reccuringOptions.find(
+    (option) => option.value === repeatUnit
+  );
 
   return (
     <Modal
@@ -95,6 +149,7 @@ export const CreateReminderModal = ({
       <View
         style={{
           flex: 1,
+          gap: 16,
           paddingTop: 16,
           paddingBottom: 32,
           paddingHorizontal: 16,
@@ -163,6 +218,42 @@ export const CreateReminderModal = ({
               </Button>
             </ButtonGroup>
           </View>
+
+          <CheckBox
+            style={{ marginLeft: 2 }}
+            checked={isRecurring}
+            onChange={(checked) =>
+              setValue("isRecurring", checked, {
+                shouldValidate: true,
+              })
+            }
+          >
+            Powiadomienie cykliczne
+          </CheckBox>
+
+          {isRecurring && (
+            <View>
+              <Text style={{ fontSize: 14, marginBottom: 4 }}>
+                Przypominaj co:
+              </Text>
+
+              <Select
+                placeholder="Wybierz jednostkę"
+                value={selectedRecuringOption?.label}
+                selectedIndex={
+                  selectedRecuringOption
+                    ? new IndexPath(selectedRecuringOption.index)
+                    : undefined
+                }
+                onSelect={handleReccuringOptionChange as any}
+                style={{ flex: 1 }}
+              >
+                {reccuringOptions.map((option) => (
+                  <SelectItem key={option.value} title={option.label} />
+                ))}
+              </Select>
+            </View>
+          )}
         </View>
 
         {isDatePickerOpen && (
