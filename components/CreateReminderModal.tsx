@@ -7,6 +7,7 @@ import {
   Select,
   SelectItem,
   IndexPath,
+  useTheme,
 } from "@ui-kitten/components";
 import { useState } from "react";
 import { Modal, View } from "react-native";
@@ -63,6 +64,7 @@ export const CreateReminderModal = ({
   onDelete,
   reminder,
 }: Props) => {
+  const theme = useTheme();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
 
@@ -163,6 +165,7 @@ export const CreateReminderModal = ({
           paddingTop: 16,
           paddingBottom: 32,
           paddingHorizontal: 16,
+          backgroundColor: theme["background-basic-color-1"],
         }}
       >
         <View

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import * as eva from "@eva-design/eva";
 import "react-native-get-random-values";
-import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
+import { ApplicationProvider } from "@ui-kitten/components";
 import * as Notifications from "expo-notifications";
 import { Tabs } from "expo-router";
-import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import { SplashScreen } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { getUserPreferences } from "../utils/userPreferences";
 import { UserPreferencesProvider } from "../components/UserPreferencesContext";
 import { Preferences } from "../types";
@@ -34,7 +34,7 @@ const AppLayout = () => {
   return (
     <>
       {!isAppReady && <SplashScreen />}
-      <IconRegistry icons={EvaIconsPack} />
+      <StatusBar style={theme === "light" ? "dark" : "light"} />
       <ApplicationProvider {...eva} theme={evaTheme}>
         <UserPreferencesProvider theme={theme} setTheme={setTheme}>
           <Tabs />
