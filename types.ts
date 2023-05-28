@@ -9,6 +9,12 @@ export type Reminder = {
   notificationId?: string;
 };
 
+export type HistoryReminder = {
+  title: string;
+  description: string;
+  date: string;
+};
+
 export type Preferences = {
   theme: "light" | "dark";
 };

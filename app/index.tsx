@@ -59,14 +59,12 @@ const App = () => {
     <>
       <Tabs.Screen
         options={{
-          title: "Przypomnienia",
           headerStyle: {
             backgroundColor: theme["background-basic-color-2"],
           },
           tabBarStyle: {
             backgroundColor: theme["background-basic-color-2"],
           },
-          tabBarIcon: () => <Text>🔔</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>
               Przypomnienia

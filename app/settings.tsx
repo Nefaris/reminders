@@ -17,14 +17,12 @@ const SettingsPage = () => {
     <>
       <Tabs.Screen
         options={{
-          title: "Ustawienia",
           headerStyle: {
             backgroundColor: theme["background-basic-color-2"],
           },
           tabBarStyle: {
             backgroundColor: theme["background-basic-color-2"],
           },
-          tabBarIcon: () => <Text>⚙️</Text>,
           headerTitle: () => (
             <Text style={{ fontWeight: "bold", fontSize: 24 }}>Ustawienia</Text>
           ),
