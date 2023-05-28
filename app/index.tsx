@@ -7,6 +7,7 @@ import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
 
 const App = () => {
+  const [selectedReminder, setSelectedReminder] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [reminders, setReminders] = useState<Reminder[]>([]);
 
@@ -16,6 +17,10 @@ const App = () => {
       setReminders(JSON.parse(reminders));
     });
   }, []);
+
+  const handleOpenReminder = (reminder: Reminder) => {
+    setSelectedReminder(reminder.id);
+  };
 
   const handleCreateReminder = async (reminder: Reminder) => {
     setReminders((reminders) => [...reminders, reminder]);
@@ -45,7 +50,11 @@ const App = () => {
         <List
           data={reminders}
           renderItem={({ item }) => (
-            <ListItem title={item.title} description={item.description} />
+            <ListItem
+              onPress={() => handleOpenReminder(item)}
+              title={item.title}
+              description={item.description}
+            />
           )}
         />
       </Layout>

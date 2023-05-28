@@ -1,5 +1,5 @@
 import { Layout, Text } from "@ui-kitten/components";
-import { Tabs, Link } from "expo-router";
+import { Tabs } from "expo-router";
 
 const AboutPage = () => {
   return (
