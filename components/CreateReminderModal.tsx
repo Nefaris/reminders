@@ -1,4 +1,4 @@
-import { Input, Button, Text } from "@ui-kitten/components";
+import { Input, Button, Text, ButtonGroup } from "@ui-kitten/components";
 import { useState } from "react";
 import { Modal, View } from "react-native";
 import DateTimePicker, {
@@ -10,57 +10,53 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { nanoid } from "nanoid";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Reminder } from "../types";
+import dayjs from "dayjs";
 
 type Props = {
-  visible: boolean;
   onDismiss: () => void;
   onSubmit: (data: Reminder) => void;
+  onDelete: (data: Reminder) => void;
+  reminder?: Reminder;
 };
 
 const formSchema = z.object({
   title: z.string().min(1, "Pole wymagane"),
   description: z.string(),
-  // date: z.date(),
-  // time: z.date(),
+  date: z.date(),
+  time: z.date(),
 });
 
 type FormFields = z.infer<typeof formSchema>;
 
 export const CreateReminderModal = ({
-  visible,
   onDismiss,
   onSubmit,
+  onDelete,
+  reminder,
 }: Props) => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
 
-  const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
-
-  const { formState, handleSubmit, reset, setValue, watch } =
-    useForm<FormFields>({
-      resolver: zodResolver(formSchema),
-      defaultValues: {
-        title: "",
-        description: "",
-      },
-    });
+  const { formState, handleSubmit, setValue, watch } = useForm<FormFields>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      date: new Date(),
+      time: new Date(),
+    },
+  });
 
   const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
     if (!date) return;
-    setDate(date);
     setIsDatePickerOpen(false);
+    setValue("date", date, { shouldValidate: true });
   };
 
   const handleTimeChange = (event: DateTimePickerEvent, date?: Date) => {
     if (!date) return;
-    setTime(date);
     setIsTimePickerOpen(false);
-  };
-
-  const handleDismiss = () => {
-    onDismiss();
-    reset();
+    setValue("time", date, { shouldValidate: true });
   };
 
   const submitHandler = async (data: FormFields) => {
@@ -83,13 +79,16 @@ export const CreateReminderModal = ({
     onSubmit(reminder);
   };
 
+  const isEdit = !!reminder;
   const titleValue = watch("title");
   const descriptionValue = watch("description");
+  const dateValue = watch("date");
+  const timeValue = watch("time");
 
   return (
     <Modal
-      visible={visible}
-      onDismiss={handleDismiss}
+      visible
+      onDismiss={onDismiss}
       presentationStyle="pageSheet"
       animationType="slide"
     >
@@ -111,9 +110,9 @@ export const CreateReminderModal = ({
           }}
         >
           <Text style={{ fontWeight: "bold", fontSize: 24 }}>
-            Dodaj przypomnienie
+            {isEdit ? "Edytuj przypomnienie" : "Dodaj przypomnienie"}
           </Text>
-          <Button size="tiny" onPress={handleDismiss}>
+          <Button size="tiny" onPress={onDismiss}>
             Zamknij
           </Button>
         </View>
@@ -144,19 +143,33 @@ export const CreateReminderModal = ({
             }
           />
 
-          <Button onPress={() => setIsDatePickerOpen(true)}>
-            Wybierz datę
-          </Button>
+          <View>
+            <Text style={{ fontSize: 14, marginBottom: 4 }}>
+              Kliknij w pole, aby wybrać datę i godzinę przypomnienia
+            </Text>
 
-          <Button onPress={() => setIsTimePickerOpen(true)}>
-            Wybierz godzinę
-          </Button>
+            <ButtonGroup>
+              <Button
+                style={{ flex: 1 }}
+                onPress={() => setIsDatePickerOpen(true)}
+              >
+                {dayjs(dateValue).format("DD.MM.YYYY")}
+              </Button>
+              <Button
+                style={{ flex: 1 }}
+                onPress={() => setIsTimePickerOpen(true)}
+              >
+                {dayjs(timeValue).format("HH:mm")}
+              </Button>
+            </ButtonGroup>
+          </View>
         </View>
 
         {isDatePickerOpen && (
           <DateTimePicker
             mode="date"
-            value={date}
+            minimumDate={new Date()}
+            value={dateValue}
             onChange={handleDateChange}
           />
         )}
@@ -164,17 +177,25 @@ export const CreateReminderModal = ({
         {isTimePickerOpen && (
           <DateTimePicker
             mode="time"
-            value={time}
+            is24Hour
+            value={timeValue}
             onChange={handleTimeChange}
           />
         )}
 
-        <Button
-          onPress={handleSubmit(submitHandler)}
-          style={{ marginTop: "auto" }}
-        >
-          Zapisz
-        </Button>
+        <View style={{ gap: 8, marginTop: "auto" }}>
+          {isEdit && (
+            <Button
+              status="danger"
+              onPress={() => onDelete(reminder)}
+              style={{ marginTop: "auto" }}
+            >
+              Usuń
+            </Button>
+          )}
+
+          <Button onPress={handleSubmit(submitHandler)}>Zapisz</Button>
+        </View>
       </View>
     </Modal>
   );

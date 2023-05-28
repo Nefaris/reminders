@@ -7,7 +7,7 @@ import { CreateReminderModal } from "../components/CreateReminderModal";
 import { Reminder } from "../types";
 
 const App = () => {
-  const [selectedReminder, setSelectedReminder] = useState<string | null>(null);
+  const [reminder, setReminder] = useState<Reminder | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [reminders, setReminders] = useState<Reminder[]>([]);
 
@@ -19,11 +19,29 @@ const App = () => {
   }, []);
 
   const handleOpenReminder = (reminder: Reminder) => {
-    setSelectedReminder(reminder.id);
+    setReminder(reminder);
   };
 
   const handleCreateReminder = async (reminder: Reminder) => {
     setReminders((reminders) => [...reminders, reminder]);
+  };
+
+  const handleDismissReminder = () => {
+    setReminder(null);
+    setIsCreateModalOpen(false);
+  };
+
+  const handleDeleteReminder = (reminder: Reminder) => {
+    const oldReminders = [...reminders];
+    const newReminders = reminders.filter((r) => r.id !== reminder.id);
+
+    setReminder(null);
+    setIsCreateModalOpen(false);
+    setReminders(newReminders);
+
+    AsyncStorage.setItem("reminders", JSON.stringify(newReminders)).catch(() =>
+      setReminders(oldReminders)
+    );
   };
 
   return (
@@ -59,11 +77,14 @@ const App = () => {
         />
       </Layout>
 
-      <CreateReminderModal
-        visible={isCreateModalOpen}
-        onDismiss={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateReminder}
-      />
+      {(isCreateModalOpen || reminder) && (
+        <CreateReminderModal
+          reminder={reminder}
+          onDelete={handleDeleteReminder}
+          onDismiss={handleDismissReminder}
+          onSubmit={handleCreateReminder}
+        />
+      )}
     </>
   );
 };
